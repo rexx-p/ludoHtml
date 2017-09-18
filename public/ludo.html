@@ -1,0 +1,153 @@
+<!-- ludo.html -->
+<!doctype html>
+
+<!-- ASSIGN OUR ANGULAR MODULE -->
+<html ng-app="myApp" xmlns="http://www.w3.org/1999/html" lang="en">
+<head>
+    <!-- META -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1 shrink-to-fit=yes">
+    <!-- Optimize mobile viewport -->
+
+    <title>Fitneese</title>
+
+    <!-- SCROLLS -->
+    <link rel="stylesheet" href="stylesheets/bootstrap.min.css">
+    <!-- SPELLS -->
+    <script src="javascripts/angular.js"></script>
+    <link rel="stylesheet" href="./stylesheets/style.css">
+    <script src="javascripts/angular-ui-router.min.js"></script>
+    <script src="javascripts/controllers.js"></script>
+    <script src="javascripts/app.js"></script>
+    <script src="javascripts/services.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<!-- SET THE CONTROLLER AND GET ALL TODOS -->
+<body ng-controller="mainController">
+<div class="container">
+    <div id="todo-form" class="row">
+        <div class="col-sm-8 col-sm-offset-2 text-center">
+            <div ng-show="gameId">Game ID : {{gameId}}</div>
+            <div id="buttons" ng-show="!game">
+                <button ng-click="createNewGame()">Create New Game</button>
+                <button ng-click="joinGame()">Join a Game</button>
+                <button ng-click="reconnectToGame()">Reconnect to A Game</button>
+            </div>
+            <div ng-show="game">
+                <br><br><br><br>
+                <!-- createToDo() WILL CREATE NEW TODOS -->
+                <button id="roll" class="btn btn-primary btn-lg" ng-click="rollTheDice()">roll</button>
+                <div id="turn">Roll of Player{{game.rollTurn+1}}</div>
+                <div id="turn">Turn of Player{{game.turn+1}}</div>
+
+                <table border="1" class="diceValues">
+                    <tr>
+                        <td ng-repeat="value in game.players[game.turn].diceValues track by $index">
+                            <label> <input type="radio" ng-model="$parent.selectedValue"
+                                           value="{{value}}">{{value}}</label>
+                        </td>
+                    </tr>
+                </table>
+                <div id="message">{{message}}</div>
+                <div id="selectedValue">{{selectedValue}}</div>
+            </div>
+        </div>
+    </div>
+    <br><br> <!---- <br><br><br><br><br><br><br><br><br><br><br><br><br> -->
+</div>
+<br><br>
+<div class="ludo" ng-show="game">
+    <div id="FirstRow" class="first-row contain">
+        <table border="1" class="flex-item playerBox">
+            <tr ng-repeat="row in getArray(2) track by $index" ng-init="plNum =1">
+                <td ng-repeat="col in getArray(2) track by $index" id="start{{plNum}}{{row}}{{col}}">
+                    <div class="coin player{{plNum}} my-div" ng-init="coinNumber=(col*1)+(row*2)"
+                         id="coin{{plNum}}{{coinNumber}}"
+                         class="" ng-click="emitWalk(plNum,coinNumber)" start="start{{plNum}}{{row}}{{col}}">
+                        <div class="downArrow bounce" ng-show="game.turn === plNum">
+                            <img width="40" height="40" class="makeArrow"/>
+                        </div>
+                        <img src="images/coin{{plNum}}.png">
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <table border="1" id="myTable3" class="flex-item ludo-box-vertical">
+            <tr ng-repeat="row in table3 track by $index">
+                <td ng-repeat="col in row track by $index" id="ludo{{col}}" class=""></td>
+            </tr>
+        </table>
+        <table border="1" class="flex-item playerBox">
+            <tr ng-repeat="row in getArray(2) track by $index" ng-init="plNum =2">
+                <td ng-repeat="col in getArray(2) track by $index" id="start{{plNum}}{{row}}{{col}}">
+                    <div class="coin player{{plNum}} my-div" ng-init="coinNumber=(col*1)+(row*2)"
+                         id="coin{{plNum}}{{coinNumber}}"
+                         class="" ng-click="emitWalk(plNum,coinNumber)" start="start{{plNum}}{{row}}{{col}}">
+                        <div class="downArrow bounce" ng-show="game.turn === plNum">
+                            <img width="40" height="40" class="makeArrow"/>
+                        </div>
+                        <img src="images/coin{{plNum}}.png">
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="second-row contain">
+        <table border="1" id="myTable2" class="flex-item ludo-box-horizontal">
+            <tr ng-repeat="row in table2 track by $index">
+                <td ng-repeat="col in row track by $index" id="ludo{{col}}"></td>
+            </tr>
+        </table>
+        <table border="1" id="success" class="success flex-item">
+            <tr>
+                <td>
+                    <div id="dice-value">{{game.lastDiceValue}}</div>
+                </td>
+            </tr>
+        </table>
+        <table border="1" id="myTable4" class="flex-item ludo-box-horizontal">
+            <tr ng-repeat="row in table4 track by $index">
+                <td ng-repeat="col in row track by $index" id="ludo{{col}}"></td>
+            </tr>
+        </table>
+    </div>
+    <div class="contain first-row">
+        <!-- here playerNumber= 0-->
+        <table border="1" class="flex-item playerBox">
+            <tr ng-repeat="row in getArray(2) track by $index" ng-init="plNum =0">
+                <td ng-repeat="col in getArray(2) track by $index" id="start{{plNum}}{{row}}{{col}}">
+                    <div class="coin player{{plNum}} my-div" ng-init="coinNumber=(col*1)+(row*2)"
+                         id="coin{{plNum}}{{coinNumber}}"
+                         class="" ng-click="emitWalk(plNum,coinNumber)" start="start{{plNum}}{{row}}{{col}}">
+                        <div class="downArrow bounce" ng-show="game.turn === plNum">
+                            <img width="40" height="40" class="makeArrow"/>
+                        </div>
+                        <img src="images/coin{{plNum}}.png">
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <table border="1" id="myTable1" class="flex-item ludo-box-vertical">
+            <tr ng-repeat="row in table1 track by $index">
+                <td ng-repeat="col in row track by $index" id="ludo{{col}}"></td>
+            </tr>
+        </table>
+        <table border="1" class="flex-item playerBox">
+            <tr ng-repeat="row in getArray(2) track by $index" ng-init="plNum =3">
+                <td ng-repeat="col in getArray(2) track by $index" id="start{{plNum}}{{row}}{{col}}">
+                    <div class="coin player{{plNum}} my-div" ng-init="coinNumber=(col*1)+(row*2)"
+                         id="coin{{plNum}}{{coinNumber}}"
+                         class="" ng-click="emitWalk(plNum,coinNumber)" start="start{{plNum}}{{row}}{{col}}">
+                        <div class="downArrow bounce" ng-show="game.turn === plNum">
+                            <img width="40" height="40" class="makeArrow"/>
+                        </div>
+                        <img src="images/coin{{plNum}}.png">
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>
